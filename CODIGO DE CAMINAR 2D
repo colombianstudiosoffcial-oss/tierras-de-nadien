@@ -1,0 +1,13 @@
+@export var velocidad: float = 200.0
+
+func _physics_process(delta):
+    var direccion = Vector2.ZERO
+
+    direccion.x = Input.get_axis("ui_left", "ui_right")
+    direccion.y = Input.get_axis("ui_up", "ui_down")
+
+    direccion = direccion.normalized()
+
+    velocity = direccion * velocidad
+
+    move_and_slide()
