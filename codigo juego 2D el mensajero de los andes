@@ -1,0 +1,6 @@
+git clone https://github.com/TU_USUARIO/ramiro-colombian-studios.git
+cd ramiro-colombian-studios
+# Copia aquí El_Mensajero_de_los_Andes.html y README.md
+git add .
+git commit -m "Ramiro - COLOMBIAN STUDIOS - juego completo"
+git push
