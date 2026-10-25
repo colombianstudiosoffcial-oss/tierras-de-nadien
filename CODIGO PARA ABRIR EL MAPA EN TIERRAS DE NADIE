@@ -1,0 +1,54 @@
+extends CanvasLayer
+
+@export var jugador: Node3D
+@export var tamano_mundo: Vector2 = Vector2(500, 500)
+
+@onready var panel: Control = $PanelMapa
+@onready var imagen_mapa: TextureRect = $PanelMapa/ImagenMapa
+@onready var marcador: ColorRect = $PanelMapa/MarcadorJugador
+@onready var boton_cerrar: Button = $PanelMapa/BotonCerrar
+
+var mapa_abierto: bool = false
+
+func _ready() -> void:
+    panel.hide()
+    boton_cerrar.pressed.connect(cerrar_mapa)
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event is InputEventKey and event.pressed and not event.echo:
+        if event.keycode == KEY_M:
+            if mapa_abierto:
+                cerrar_mapa()
+            else:
+                abrir_mapa()
+
+func abrir_mapa() -> void:
+    mapa_abierto = true
+    panel.show()
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    actualizar_marcador()
+
+func cerrar_mapa() -> void:
+    mapa_abierto = false
+    panel.hide()
+    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _process(_delta: float) -> void:
+    if mapa_abierto:
+        actualizar_marcador()
+
+func actualizar_marcador() -> void:
+    if jugador == null:
+        return
+
+    var rect := imagen_mapa.get_global_rect()
+    var posicion := jugador.global_position
+
+    # Convertir las coordenadas del mundo a coordenadas del mapa.
+    var x := (posicion.x / tamano_mundo.x) + 0.5
+    var y := (posicion.z / tamano_mundo.y) + 0.5
+
+    marcador.position = imagen_mapa.position + Vector2(
+        x * rect.size.x - marcador.size.x / 2.0,
+        y * rect.size.y - marcador.size.y / 2.0
+    )
