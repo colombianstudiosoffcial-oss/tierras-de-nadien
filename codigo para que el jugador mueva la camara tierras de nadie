@@ -1,0 +1,36 @@
+extends CharacterBody3D
+
+@export var sensibilidad: float = 0.003
+
+@onready var cabeza: Node3D = $Cabeza
+@onready var camara: Camera3D = $Cabeza/Camera3D
+
+var rotacion_vertical: float = 0.0
+
+func _ready() -> void:
+    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _unhandled_input(event: InputEvent) -> void:
+    # Girar la cámara con el ratón
+    if event is InputEventMouseMotion:
+        # Girar al personaje horizontalmente
+        rotate_y(-event.relative.x * sensibilidad)
+
+        # Mirar arriba y abajo
+        rotacion_vertical -= event.relative.y * sensibilidad
+        rotacion_vertical = clamp(
+            rotacion_vertical,
+            deg_to_rad(-80),
+            deg_to_rad(80)
+        )
+
+        cabeza.rotation.x = rotacion_vertical
+
+    # Mostrar el ratón con Escape
+    if event.is_action_pressed("ui_cancel"):
+        Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+    # Volver a capturar el ratón con clic izquierdo
+    if event is InputEventMouseButton:
+        if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+            Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
