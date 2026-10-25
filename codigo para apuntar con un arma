@@ -1,0 +1,47 @@
+extends CharacterBody3D
+
+@export var velocidad_normal: float = 5.0
+@export var velocidad_apuntando: float = 2.5
+@export var sensibilidad: float = 0.003
+
+@onready var camara: Camera3D = $Camera3D
+
+var apuntando: bool = false
+var rotacion_vertical: float = 0.0
+
+func _ready() -> void:
+    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _unhandled_input(event: InputEvent) -> void:
+    # Mover la cámara con el ratón
+    if event is InputEventMouseMotion:
+        rotate_y(-event.relative.x * sensibilidad)
+
+        rotacion_vertical -= event.relative.y * sensibilidad
+        rotacion_vertical = clamp(
+            rotacion_vertical,
+            deg_to_rad(-70),
+            deg_to_rad(70)
+        )
+
+        camara.rotation.x = rotacion_vertical
+
+    # Mantener pulsado el botón derecho para apuntar
+    if event is InputEventMouseButton:
+        if event.button_index == MOUSE_BUTTON_RIGHT:
+            apuntando = event.pressed
+
+    # Liberar el ratón con Escape
+    if event.is_action_pressed("ui_cancel"):
+        Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _physics_process(_delta: float) -> void:
+    # Reducir la velocidad mientras apuntas
+    var velocidad_actual = velocidad_normal
+
+    if apuntando:
+        velocidad_actual = velocidad_apuntando
+
+    # Mostrar el estado del apuntado
+    if apuntando:
+        print("Apuntando con la pistola")
