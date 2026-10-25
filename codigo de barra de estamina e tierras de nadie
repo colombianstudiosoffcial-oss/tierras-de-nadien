@@ -1,0 +1,64 @@
+extends CharacterBody3D
+
+@export var velocidad_caminar: float = 5.0
+@export var velocidad_correr: float = 9.0
+
+@export var estamina_maxima: float = 100.0
+@export var consumo_estamina: float = 25.0
+@export var recuperacion_estamina: float = 15.0
+
+var estamina: float = 100.0
+
+@onready var barra_estamina: ProgressBar = \
+    get_node_or_null("HUD/BarraEstamina")
+
+func _ready() -> void:
+    estamina = estamina_maxima
+
+    if barra_estamina:
+        barra_estamina.max_value = estamina_maxima
+        barra_estamina.value = estamina
+
+func _physics_process(delta: float) -> void:
+    var entrada := Input.get_vector(
+        "izquierda", "derecha", "adelante", "atras"
+    )
+
+    var corriendo := (
+        Input.is_action_pressed("correr")
+        and entrada.length_squared() > 0.0
+        and estamina > 0.0
+    )
+
+    var velocidad_actual := velocidad_caminar
+
+    if corriendo:
+        velocidad_actual = velocidad_correr
+        estamina -= consumo_estamina * delta
+    else:
+        estamina += recuperacion_estamina * delta
+
+    estamina = clampf(estamina, 0.0, estamina_maxima)
+
+    # Movimiento relativo a la orientación del personaje
+    var direccion := (
+        transform.basis *
+        Vector3(entrada.x, 0.0, entrada.y)
+    ).normalized()
+
+    if direccion.length_squared() > 0.0:
+        velocity.x = direccion.x * velocidad_actual
+        velocity.z = direccion.z * velocidad_actual
+    else:
+        velocity.x = move_toward(
+            velocity.x, 0.0, velocidad_caminar * delta
+        )
+        velocity.z = move_toward(
+            velocity.z, 0.0, velocidad_caminar * delta
+        )
+
+    # Actualizar la barra visual
+    if barra_estamina:
+        barra_estamina.value = estamina
+
+    move_and_slide()
