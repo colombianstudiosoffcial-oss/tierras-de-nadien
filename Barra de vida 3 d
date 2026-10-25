@@ -1,0 +1,51 @@
+extends ProgressBar
+
+@export var vida_maxima: float = 100.0
+@export var vida_actual: float = 100.0
+
+@export var dano_golpe: float = 10.0
+@export var dano_disparo: float = 20.0
+@export var multiplicador_cabeza: float = 2.5
+@export var multiplicador_corazon: float = 3.0
+
+func _ready() -> void:
+	min_value = 0
+	max_value = vida_maxima
+	value = vida_actual
+	actualizar_barra()
+
+func recibir_golpe() -> void:
+	aplicar_dano(dano_golpe)
+
+func recibir_disparo() -> void:
+	aplicar_dano(dano_disparo)
+
+func recibir_disparo_cabeza() -> void:
+	aplicar_dano(dano_disparo * multiplicador_cabeza)
+
+func recibir_disparo_corazon() -> void:
+	aplicar_dano(dano_disparo * multiplicador_corazon)
+
+func aplicar_dano(cantidad: float) -> void:
+	vida_actual = clampf(vida_actual - cantidad, 0.0, vida_maxima)
+	actualizar_barra()
+
+	if vida_actual <= 0.0:
+		morir()
+
+func curar(cantidad: float) -> void:
+	vida_actual = clampf(vida_actual + cantidad, 0.0, vida_maxima)
+	actualizar_barra()
+
+func actualizar_barra() -> void:
+	value = vida_actual
+
+	if vida_actual > 60.0:
+		modulate = Color.GREEN
+	elif vida_actual > 30.0:
+		modulate = Color.YELLOW
+	else:
+		modulate = Color.RED
+
+func morir() -> void:
+	print("El personaje ha muerto")
