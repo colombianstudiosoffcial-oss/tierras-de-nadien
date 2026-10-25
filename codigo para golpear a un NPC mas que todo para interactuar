@@ -1,0 +1,62 @@
+extends CharacterBody3D
+
+@export var alcance_interaccion: float = 3.0
+@export var danio_golpe: int = 25
+
+@onready var camara: Camera3D = $Cabeza/Camera3D
+
+func _input(event: InputEvent) -> void:
+    if event.is_action_pressed("interactuar"):
+        interactuar_con_npc()
+
+    if event.is_action_pressed("golpear"):
+        golpear_npc()
+
+func buscar_npc() -> Node:
+    var origen = camara.global_position
+    var direccion = -camara.global_transform.basis.z
+    var destino = origen + direccion * alcance_interaccion
+
+    var consulta = PhysicsRayQueryParameters3D.create(
+        origen, destino
+    )
+    consulta.exclude = [get_rid()]
+
+    var resultado = get_world_3d().direct_space_state.intersect_ray(
+        consulta
+    )
+
+    if resultado.is_empty():
+        return null
+
+    var objetivo = resultado.collider
+
+    if objetivo.is_in_group("npc"):
+        return objetivo
+
+    # Permite que la colisión pertenezca a un hijo del NPC
+    var padre = objetivo.get_parent()
+    if padre and padre.is_in_group("npc"):
+        return padre
+
+    return null
+
+func interactuar_con_npc() -> void:
+    var npc = buscar_npc()
+
+    if npc == null:
+        print("No hay ningún NPC delante.")
+        return
+
+    if npc.has_method("interactuar"):
+        npc.interactuar(self)
+
+func golpear_npc() -> void:
+    var npc = buscar_npc()
+
+    if npc == null:
+        print("No hay ningún NPC al alcance.")
+        return
+
+    if npc.has_method("recibir_danio"):
+        npc.recibir_danio(danio_golpe, global_position)
