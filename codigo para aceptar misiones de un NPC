@@ -1,0 +1,57 @@
+extends CharacterBody3D
+
+@export var nombre_npc: String = "Guardia"
+@export var vida_maxima: int = 100
+@export var fuerza_retroceso: float = 4.0
+@export var ofrece_mision: bool = true
+
+var vida: int
+var mision_aceptada: bool = false
+var mision_completada: bool = false
+
+func _ready() -> void:
+    add_to_group("npc")
+    vida = vida_maxima
+
+func interactuar(_jugador: Node) -> void:
+    if vida <= 0:
+        print(nombre_npc, ": No puedo hablar contigo.")
+        return
+
+    print(nombre_npc, ": ¡Hola, viajero!")
+
+    if not ofrece_mision:
+        print(nombre_npc, ": Que tengas un buen día.")
+        return
+
+    if mision_completada:
+        print(nombre_npc, ": ¡Gracias por ayudarme!")
+    elif not mision_aceptada:
+        print(nombre_npc, ": Necesito que derrotes a 3 enemigos.")
+        print("Pulsa E otra vez para aceptar la misión.")
+        mision_aceptada = true
+    else:
+        print(nombre_npc, ": Derrota a 3 enemigos para completar la misión.")
+
+func recibir_danio(cantidad: int, origen: Vector3) -> void:
+    if vida <= 0:
+        return
+
+    vida -= cantidad
+
+    var direccion = global_position - origen
+    direccion.y = 0.0
+
+    if direccion.length_squared() > 0.001:
+        direccion = direccion.normalized()
+        velocity.x = direccion.x * fuerza_retroceso
+        velocity.z = direccion.z * fuerza_retroceso
+
+    print(nombre_npc, " recibió un golpe. Vida: ", max(vida, 0))
+
+    if vida <= 0:
+        morir()
+
+func morir() -> void:
+    print(nombre_npc, " ha sido derrotado.")
+    queue_free()
