@@ -1,0 +1,20 @@
+  consulta.exclude = [get_parent().get_rid()]
+
+    var espacio = get_world_3d().direct_space_state
+    var impacto = espacio.intersect_ray(consulta)
+
+    if not impacto.is_empty():
+        var objetivo = impacto.collider
+
+        if objetivo.has_method("recibir_danio"):
+            objetivo.recibir_danio(danio, origen)
+
+        print("¡Impacto!")
+
+    print("¡Disparo!")
+
+    await get_tree().create_timer(
+        tiempo_entre_disparos
+    ).timeout
+
+    puede_disparar = true
