@@ -1,0 +1,46 @@
+extends CharacterBody3D
+
+@onready var modelos: Node3D = $Modelos
+
+var skin_actual: int = 0
+var skins: Array[Node3D] = []
+
+func _ready() -> void:
+    # Guardar los modelos disponibles
+    for hijo in modelos.get_children():
+        if hijo is Node3D:
+            skins.append(hijo)
+
+    # Mostrar solamente la primera skin
+    actualizar_skin()
+
+func _input(event: InputEvent) -> void:
+    # Cambiar a la siguiente skin con N
+    if event is InputEventKey:
+        if event.pressed and not event.echo:
+            if event.keycode == KEY_N:
+                cambiar_siguiente_skin()
+
+            # Volver a la skin anterior con B
+            elif event.keycode == KEY_B:
+                cambiar_skin_anterior()
+
+func cambiar_siguiente_skin() -> void:
+    if skins.is_empty():
+        return
+
+    skin_actual = (skin_actual + 1) % skins.size()
+    actualizar_skin()
+
+func cambiar_skin_anterior() -> void:
+    if skins.is_empty():
+        return
+
+    skin_actual = (skin_actual - 1 + skins.size()) % skins.size()
+    actualizar_skin()
+
+func actualizar_skin() -> void:
+    for i in range(skins.size()):
+        skins[i].visible = (i == skin_actual)
+
+    print("Skin seleccionada: ", skin_actual + 1)
