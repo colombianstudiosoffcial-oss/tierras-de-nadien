@@ -1,0 +1,43 @@
+extends CharacterBody3D
+
+@export var velocidad_caminar: float = 5.0
+@export var velocidad_correr: float = 10.0
+@export var velocidad_salto: float = 4.5
+@export var gravedad: float = 9.8
+
+func _physics_process(delta: float) -> void:
+    # Aplicar gravedad
+    if not is_on_floor():
+        velocity.y -= gravedad * delta
+
+    # Saltar
+    if Input.is_action_just_pressed("saltar") and is_on_floor():
+        velocity.y = velocidad_salto
+
+    # Elegir velocidad: caminar o correr
+    var velocidad = velocidad_caminar
+
+    if Input.is_action_pressed("correr"):
+        velocidad = velocidad_correr
+
+    # Movimiento con WASD
+    var entrada = Input.get_vector(
+        "izquierda",
+        "derecha",
+        "adelante",
+        "atras"
+    )
+
+    var direccion = (
+        transform.basis *
+        Vector3(entrada.x, 0, entrada.y)
+    ).normalized()
+
+    if direccion:
+        velocity.x = direccion.x * velocidad
+        velocity.z = direccion.z * velocidad
+    else:
+        velocity.x = move_toward(velocity.x, 0.0, velocidad * delta)
+        velocity.z = move_toward(velocity.z, 0.0, velocidad * delta)
+
+    move_and_slide()
