@@ -1,0 +1,27 @@
+extends Node3D
+
+@export var angulo_abierto: float = 70.0
+@export var velocidad_apertura: float = 3.0
+
+var abierta: bool = false
+var rotacion_cerrada: float
+var rotacion_objetivo: float
+
+func _ready() -> void:
+    rotacion_cerrada = rotation.y
+    rotacion_objetivo = rotacion_cerrada
+
+func _process(delta: float) -> void:
+    rotation.y = lerp_angle(
+        rotation.y,
+        rotacion_objetivo,
+        velocidad_apertura * delta
+    )
+
+func interactuar() -> void:
+    abierta = not abierta
+
+    if abierta:
+        rotacion_objetivo = rotacion_cerrada + deg_to_rad(angulo_abierto)
+    else:
+        rotacion_objetivo = rotacion_cerrada
