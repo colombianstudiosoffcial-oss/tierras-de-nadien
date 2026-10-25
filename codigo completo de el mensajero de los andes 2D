@@ -1,0 +1,48 @@
+ Ramiro — COLOMBIAN STUDIOS
+
+Juego de mundo abierto ambientado en Colombia, estilo GTA, en HTML5 + JavaScript (un solo archivo).
+
+## Historia
+
+Ramiro es un emigrante colombiano deportado de Estados Unidos por ICE. Llega al Aeropuerto El Dorado (Bogotá) sin nada. Consigue trabajo en el supermercado **The 1**, luego entrega paquetes por el país, entra en contratos peligrosos y debe enfrentarse a jefes hasta llegar a **Pedro Escobar**. Si lo derrota, obtiene el dinero para volver a EE.UU.
+
+## Cómo jugar
+
+1. Abre `El_Mensajero_de_los_Andes.html` en cualquier navegador (Chrome, Firefox, Edge, etc.).
+2. No necesita instalación ni servidor.
+3. También funciona en móvil (controles táctiles incluidos).
+
+## Controles
+
+| Tecla | Acción |
+|-------|--------|
+| WASD / Flechas | Mover / conducir |
+| Espacio | Golpear (o frenar en vehículo) |
+| Z | Disparar |
+| X | Robar / bajar del vehículo |
+| E | Interactuar (trabajo, comida, hospital, misiones) |
+| P | Pausa |
+
+## Características
+
+- Mundo abierto: Bogotá, Medellín, Cartagena, Cali, Eje Cafetero, Amazonas, Llanos, Páramo
+- Sistema de búsqueda policial (estrellas)
+- Robar vehículos
+- Hambre, energía, comida sana/chatarra y obesidad
+- Hospital
+- Misiones de historia + misiones de trabajo (taxi, domicilio, carga, patrulla, rescate)
+- Día / noche y lluvia
+- Jefes y jefe final Pedro Escobar
+- Minimapa
+
+## Archivos
+
+- `El_Mensajero_de_los_Andes.html` — juego completo (HTML + CSS + JS en un solo archivo)
+
+## Créditos
+
+**COLOMBIAN STUDIOS**
+
+## Licencia
+
+Uso libre para fines educativos y de entretenimiento.
