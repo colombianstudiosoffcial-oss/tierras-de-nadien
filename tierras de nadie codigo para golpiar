@@ -1,0 +1,48 @@
+extends CharacterBody3D
+
+@export var danio: int = 25
+@export var alcance: float = 2.0
+@export var tiempo_entre_golpes: float = 0.5
+
+var puede_atacar: bool = true
+
+func _input(event: InputEvent) -> void:
+    if event.is_action_pressed("atacar"):
+        atacar()
+
+func atacar() -> void:
+    if not puede_atacar:
+        return
+
+    puede_atacar = false
+
+    # Buscar enemigos cercanos
+    var espacio = get_world_3d().direct_space_state
+
+    var forma = SphereShape3D.new()
+    forma.radius = alcance
+
+    var consulta = PhysicsShapeQueryParameters3D.new()
+    consulta.shape = forma
+    consulta.transform = Transform3D(
+        Basis.IDENTITY,
+        global_position + (-global_transform.basis.z * alcance * 0.6)
+    )
+    consulta.collision_mask = 2
+    consulta.collide_with_areas = true
+    consulta.collide_with_bodies = true
+
+    var resultados = espacio.intersect_shape(consulta, 32)
+
+    for resultado in resultados:
+        var objetivo = resultado.collider
+
+        # Comprobar si el objetivo puede recibir daño
+        if objetivo.has_method("recibir_danio"):
+            objetivo.recibir_danio(danio, global_position)
+
+    await get_tree().create_timer(
+        tiempo_entre_golpes
+    ).timeout
+
+    puede_atacar = true
