@@ -1,0 +1,34 @@
+extends Node3D
+
+@export var angulo_abierta: float = 90.0
+@export var velocidad: float = 5.0
+
+var abierta: bool = false
+var angulo_cerrada: float
+var objetivo: float
+
+func _ready() -> void:
+	angulo_cerrada = rotation_degrees.y
+	objetivo = angulo_cerrada
+
+func _process(delta: float) -> void:
+	rotation_degrees.y = move_toward(
+		rotation_degrees.y,
+		objetivo,
+		velocidad * 90.0 * delta
+	)
+
+func interactuar() -> void:
+	abierta = not abierta
+
+	if abierta:
+		objetivo = angulo_cerrada + angulo_abierta
+	else:
+		objetivo = angulo_cerrada
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_just_pressed("interactuar"):
+		interactuar()
+
+func _on_boton_puerta_pressed() -> void:
+	interactuar()
