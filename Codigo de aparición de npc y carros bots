@@ -1,0 +1,120 @@
+extends Node3D
+
+@export var npc_escena: PackedScene
+@export var carro_escena: PackedScene
+
+@export_range(0, 200) var max_npc_y_carros: int = 200
+@export_range(0, 200) var max_npc: int = 120
+@export_range(0, 200) var max_carros: int = 80
+
+@export var intervalo_npc: float = 2.0
+@export var intervalo_carros: float = 3.0
+
+@export var distancia_minima: float = 12.0
+@export var distancia_jugador: float = 25.0
+@export var distancia_maxima_jugador: float = 180.0
+
+@export var jugador: Node3D
+@export var puntos_calles: Array[Marker3D] = []
+
+var rng := RandomNumberGenerator.new()
+var npc_activos: Array[Node3D] = []
+var carros_activos: Array[Node3D] = []
+
+var tiempo_npc := 0.0
+var tiempo_carros := 0.0
+
+
+func _ready() -> void:
+	rng.randomize()
+
+
+func _process(delta: float) -> void:
+	limpiar_lista(npc_activos)
+	limpiar_lista(carros_activos)
+
+	tiempo_npc += delta
+	tiempo_carros += delta
+
+	if tiempo_npc >= intervalo_npc:
+		tiempo_npc = 0.0
+		if npc_escena and npc_activos.size() < max_npc:
+			aparecer_entidad(npc_escena, npc_activos)
+
+	if tiempo_carros >= intervalo_carros:
+		tiempo_carros = 0.0
+		if carro_escena and carros_activos.size() < max_carros:
+			aparecer_entidad(carro_escena, carros_activos)
+
+
+func limpiar_lista(lista: Array[Node3D]) -> void:
+	for entidad in lista.duplicate():
+		if not is_instance_valid(entidad) or entidad.is_queued_for_deletion():
+			lista.erase(entidad)
+
+
+func aparecer_entidad(
+	escena: PackedScene,
+	lista: Array[Node3D]
+) -> void:
+	if npc_activos.size() + carros_activos.size() >= max_npc_y_carros:
+		return
+
+	if puntos_calles.is_empty():
+		return
+
+	for intento in range(30):
+		var punto := puntos_calles[
+			rng.randi_range(0, puntos_calles.size() - 1)
+		]
+
+		if not is_instance_valid(punto):
+			continue
+
+		var posicion := punto.global_position
+
+		if jugador and is_instance_valid(jugador):
+			var distancia := posicion.distance_to(jugador.global_position)
+
+			if distancia < distancia_jugador:
+				continue
+
+			if distancia > distancia_maxima_jugador:
+				continue
+
+		if hay_entidad_cerca(posicion):
+			continue
+
+		var entidad := escena.instantiate() as Node3D
+
+		if entidad == null:
+			return
+
+		add_child(entidad)
+		entidad.global_position = posicion
+		lista.append(entidad)
+		return
+
+
+func hay_entidad_cerca(posicion: Vector3) -> bool:
+	for entidad in npc_activos + carros_activos:
+		if not is_instance_valid(entidad):
+			continue
+
+		if entidad.global_position.distance_to(posicion) < distancia_minima:
+			return true
+
+	return false
+
+
+func reciclar_entidad(entidad: Node3D, es_npc: bool) -> void:
+	if not is_instance_valid(entidad):
+		return
+
+	var lista: Array[Node3D] = npc_activos if es_npc else carros_activos
+
+	if not lista.has(entidad):
+		return
+
+	lista.erase(entidad)
+	entidad.queue_free()
