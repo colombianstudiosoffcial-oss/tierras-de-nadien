@@ -1,0 +1,16 @@
+extends CharacterBody3D
+
+@export var vida_maxima: int = 100
+
+var vida: int
+
+func _ready() -> void:
+    vida = vida_maxima
+
+func recibir_danio(cantidad: int, origen: Vector3) -> void:
+    vida -= cantidad
+
+    print("Vida restante: ", max(vida, 0))
+
+    if vida <= 0:
+        queue_free()
